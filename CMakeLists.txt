@@ -15,14 +15,27 @@ LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake") # 添加本地CMake脚本目
 INCLUDE(cmake/script_version_number.cmake REQUIRED)#添加项目版本号
 
 #设置路径
+SET(OPENMVO_LIBS_ROOT "${CMAKE_SOURCE_DIR}/libs" CACHE INTERNAL "") 
 SET(OPENMVO_SOURCE_DIR  ${CMAKE_CURRENT_SOURCE_DIR})
 SET(OPENMVO_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 SET(OPENMVO_BINARY_DIR  ${PROJECT_BINARY_DIR})
 
 #添加有用的宏
 INCLUDE(cmake/UtilsMacros.cmake REQUIRED)# 添加一些有工具宏
+INCLUDE(cmake/FilterFileLists.cmake REQUIRED)#用于文件筛选，便于后期进行跨平台
+INCLUDE(cmake/DeclareOPENMVOLib.cmake REQUIRED)#用于自动生成项目
 
 set(CMAKE_DEBUG_POSTFIX  "d")#设置Debug下lib的名称后添加d，如openmvo_XXX100d.lib
+
+#用于项目中添加筛选器
+IF (CMAKE_VERSION VERSION_GREATER 2.8.0)
+	SET(ENABLE_SOLUTION_FOLDERS ON CACHE BOOL "Group projects under virtual folders of the compiler IDE (e.g. VisualStudio)")
+ENDIF (CMAKE_VERSION VERSION_GREATER 2.8.0)
+
+if (ENABLE_SOLUTION_FOLDERS)
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+  set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMakeTargets")
+endif (ENABLE_SOLUTION_FOLDERS)
 
 #添加libs
 FIND_PACKAGE(OpenCV REQUIRED) #通过CMake系统添加OpenCV
@@ -43,9 +56,12 @@ ELSE(BUILD_SHARED_LIBS)
 	SET(CMAKE_OPENMVO_BUILD_SHARED_LIB_ONOFF 0)
 ENDIF(BUILD_SHARED_LIBS)
 
+include(cmake/script_create_config_h.cmake REQUIRED)   # Build config.h
+include(cmake/script_create_version_h.cmake REQUIRED)  # Build version.h
+
 #设置include和link路径
 INCLUDE_DIRECTORIES(".")#设置包含当前目录
-
+INCLUDE_DIRECTORIES(${OPENMVO_CONFIG_FILE_INCLUDE_DIR})#包含全局配置文件config.h
 LINK_DIRECTORIES("${CMAKE_BINARY_DIR}/lib")
 
 #设置路径，保存lib和bin到同一目录

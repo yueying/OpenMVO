@@ -1,0 +1,42 @@
+#ifndef OPENMVO_CONFIG_H
+#define OPENMVO_CONFIG_H
+
+/** 给出版本号
+  */
+#define OPENMVO_VERSION_POSTFIX "${OPENMVO_DLL_VERSION_POSTFIX}"
+
+/** 定义是否编译为动态库
+  */
+${CMAKE_OPENMVO_BUILD_SHARED_LIB}
+
+/* 定义使用了什么平台 */
+#if defined(_WIN32) || defined(_WIN32_)  || defined(WIN32) || defined(_WIN64)
+    #define OPENMVO_OS_WINDOWS
+#elif defined(unix) || defined(__unix__) || defined(__unix)
+    #define OPENMVO_OS_LINUX
+#elif defined(__APPLE__)
+    #define OPENMVO_OS_APPLE
+#else
+    #error Unsupported platform (Found neither _WIN32_, __unix__ or __APPLE__)
+#endif
+
+/** 检测是否使用了SSE2指令 */
+#if defined WIN32 && (!defined WIN64 || defined EM64T) && \
+ (_MSC_VER >= 1400) || (defined __SSE2__ && defined __GNUC__ && __GNUC__ >= 4)
+	#define OPENMVO_HAS_SSE2  ${CMAKE_OPENMVO_HAS_SSE2}   // This value can be set to 0 from CMake with DISABLE_SSE2
+#else
+	#define OPENMVO_HAS_SSE2  0
+#endif
+
+// -------------------------------
+//			对平台进行进一步检测:
+// -------------------------------
+#if !defined(OPENMVO_OS_WINDOWS) && !defined(OPENMVO_OS_LINUX) && !defined(OPENMVO_OS_APPLE)
+#error Neither OS detected from OPENMVO_OS_LINUX, OPENMVO_OS_APPLE or OPENMVO_OS_WINDOWS!
+#endif
+
+
+#endif
+
+
+

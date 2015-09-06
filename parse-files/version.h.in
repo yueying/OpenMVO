@@ -1,0 +1,12 @@
+#ifndef  OPENMVO_VERSION_H
+#define  OPENMVO_VERSION_H
+
+const char OPENMVO_version_str[] = "${CMAKE_OPENMVO_COMPLETE_NAME}";
+
+/** Version number of package in hexadecimal:
+  * A three digits version code, eg. 0.5.1 -> 0x051,  1.2.0 -> 0x120
+  */
+#define OPENMVO_VERSION ${CMAKE_OPENMVO_VERSION_CODE}
+
+
+#endif
