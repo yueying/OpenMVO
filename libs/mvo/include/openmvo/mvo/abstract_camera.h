@@ -47,6 +47,24 @@ namespace mvo
 		/// 返回相机分辨率的高度
 		inline int height() const { return height_; }
 
+		///  判断像素是否在图像帧中
+		inline bool isInFrame(const Vector2i & obs, int boundary = 0) const
+		{
+			if (obs[0] >= boundary && obs[0] < width() - boundary
+				&& obs[1] >= boundary && obs[1] < height() - boundary)
+				return true;
+			return false;
+		}
+
+		/// 判断像素是否在图像帧中，考虑图像尺度
+		inline bool isInFrame(const Vector2i &obs, int boundary, int level) const
+		{
+			if (obs[0] >= boundary && obs[0] < width() / (1 << level) - boundary
+				&& obs[1] >= boundary && obs[1] < height() / (1 << level) - boundary)
+				return true;
+			return false;
+		}
+
 	protected:
 		int width_; //!< 相机分辨率的宽度
 		int height_; //!< 相机分辨率的高度

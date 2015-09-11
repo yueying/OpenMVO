@@ -7,9 +7,13 @@
  *
  * 说明： 给出特征定义，参考rpg_svo(https://github.com/uzh-rpg/rpg_svo)
  *************************************************************************/
+#ifndef OPENMVO_MVO_FEATURE_H_
+#define OPENMVO_MVO_FEATURE_H_
+
 #include <vector>
 #include <Eigen/Core>
 #include "openmvo/mvo/frame.h"
+#include "openmvo/mvo/point3d.h"
 
 namespace mvo
 {
@@ -43,14 +47,29 @@ namespace mvo
 		Frame* frame;         //!< 指针指向特征被检测到所对应的帧
 		Vector2d px;          //!< 特征在金字塔等级为0时的像素坐标
 		int level;            //!< 特征被提取时，图像金字塔的等级
-
+		Vector3d f;           //!< 特征的单位方向向量
+		Point3D* point;       //!< 指针指向跟特征对应的3D点
+		
 		Feature(Frame* _frame, const Vector2d& _px, int _level) :
 			type(CORNER),
 			frame(_frame),
 			px(_px),
-			level(_level)
+			level(_level),
+			f(frame->cam_->cam2world(px)),
+			point(NULL)
+		{}
+
+		Feature(Frame* _frame, Point3D* _point, const Vector2d& _px, const Vector3d& _f, int _level) :
+			type(CORNER),
+			frame(_frame),
+			px(_px),			
+			level(_level),
+			f(_f),
+			point(_point)
 		{}
 
 		~Feature(){}
 	};
 }
+
+#endif // OPENMVO_MVO_FEATURE_H_

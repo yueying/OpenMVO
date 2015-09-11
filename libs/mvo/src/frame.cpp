@@ -7,6 +7,7 @@
  *
  * 说明： 帧
  *************************************************************************/
+
 #include "openmvo/mvo/frame.h"
 #include "openmvo/utils/image_utils.h"
 
@@ -24,7 +25,7 @@ namespace mvo
 
 	Frame::~Frame()
 	{
-		std::for_each(fts_.begin(), fts_.end(), [&](Feature* i){delete i; });
+		//std::for_each(fts_.begin(), fts_.end(), [&](Feature* i){if (i != NULL) { delete i; i = NULL; } });
 	}
 
 	void Frame::initFrame(const cv::Mat& img)
@@ -35,6 +36,12 @@ namespace mvo
 
 		// 构建图像金字塔，默认金字塔的等级为5
 		createImgPyramid(img, 5, img_pyr_);
+	}
+
+	/// 给帧中添加特征
+	void Frame::addFeature(Feature* ftr)
+	{
+		fts_.push_back(ftr);
 	}
 
 	// 创建图像金字塔
