@@ -1,10 +1,10 @@
-/*************************************************************************
- * ÎÄ¼şÃû£º frame
+ï»¿/*************************************************************************
+ * æ–‡ä»¶åï¼š frame
  *
- * ×÷Õß£º ·ë±ø
- * Ê±¼ä£º 2015/8/1
+ * ä½œè€…ï¼š å†¯å…µ
+ * æ—¶é—´ï¼š 2015/8/1
  *
- * ËµÃ÷£º Ö¡¶¨Òå²Î¿¼rpg_svo(https://github.com/uzh-rpg/rpg_svo)
+ * è¯´æ˜ï¼š å¸§å®šä¹‰å‚è€ƒrpg_svo(https://github.com/uzh-rpg/rpg_svo)
  *************************************************************************/
 #ifndef OPENMVO_MVO_FRAME_H_
 #define OPENMVO_MVO_FRAME_H_
@@ -21,59 +21,83 @@ namespace mvo{
 
 	struct Feature;
 
-	typedef std::list<Feature*> Features;//ÌØÕ÷list
-	typedef std::vector<cv::Mat> ImgPyr;//Í¼Ïñ½ğ×ÖËş
+	typedef std::list<Feature*> Features;//ç‰¹å¾list
+	typedef std::vector<cv::Mat> ImgPyr;//å›¾åƒé‡‘å­—å¡”
 
-	/**	¶¨ÒåÖ¡£¬±£Ö¤Ö¡µÄÎ¨Ò»ĞÔ
+	/**	å®šä¹‰å¸§ï¼Œä¿è¯å¸§çš„å”¯ä¸€æ€§
 	 */
 	class Frame : public Noncopyable
 	{
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-		/**	Ö¡µÄÊµÀı»¯£¬Í¨¹ı´«ÈëÏà»ú²ÎÊı£¬»ñµÃµÄµ±Ç°Ö¡£¬¼°Ê±¼ä´ÁÀ´È·¶¨
+		/**	å¸§çš„å®ä¾‹åŒ–ï¼Œé€šè¿‡ä¼ å…¥ç›¸æœºå‚æ•°ï¼Œè·å¾—çš„å½“å‰å¸§ï¼ŒåŠæ—¶é—´æˆ³æ¥ç¡®å®š
 		 */
 		Frame(AbstractCamera* cam, const cv::Mat& img, double timestamp);
 		~Frame();
-		/// ³õÊ¼»¯ĞÂµÄÍ¼ÏñÖ¡£¬´´½¨Í¼Ïñ½ğ×ÖËş
+		/// åˆå§‹åŒ–æ–°çš„å›¾åƒå¸§ï¼Œåˆ›å»ºå›¾åƒé‡‘å­—å¡”
 		void initFrame(const cv::Mat& img);
 
-		/// ÍùÖ¡ÖĞÌí¼ÓÌØÕ÷
+		/// å¾€å¸§ä¸­æ·»åŠ ç‰¹å¾
 		void addFeature(Feature* ftr);
 
-		/// µÃµ½Ö¡Ëù¶ÔÓ¦µÄÔ­Ê¼Í¼Ïñ
+		/// å¾—åˆ°å¸§æ‰€å¯¹åº”çš„åŸå§‹å›¾åƒ
 		inline const cv::Mat& img() const { return img_pyr_[0]; }
-		/// ½«ÊÀ½ç×ø±êÏµÖĞµÄµã×ªµ½ÏñËØ×ø±ê
+		/// å°†ä¸–ç•Œåæ ‡ç³»ä¸­çš„ç‚¹è½¬åˆ°åƒç´ åæ ‡
 		inline Vector2d w2c(const Vector3d& xyz_w) const { return cam_->world2cam(T_f_w_ * xyz_w); }
 
-		/// ½«ÏñËØ×ø±ê×ªµ½µ¥Î»ÉãÏñ»ú×ø±ê
+		/// å°†åƒç´ åæ ‡è½¬åˆ°å•ä½æ‘„åƒæœºåæ ‡
 		inline Vector3d c2f(const Vector2d& px) const { return cam_->cam2world(px[0], px[1]); }
 
-		/// ½«ÏñËØ×ø±ê×ªµ½µ¥Î»ÉãÏñ»ú×ø±ê
+		/// å°†åƒç´ åæ ‡è½¬åˆ°å•ä½æ‘„åƒæœºåæ ‡
 		inline Vector3d c2f(const double x, const double y) const { return cam_->cam2world(x, y); }
 
-		/// ½«ÊÀ½ç×ø±êÏµµÄµã×ªµ½Ïà»ú×ø±êÏµ
+		/// å°†ä¸–ç•Œåæ ‡ç³»çš„ç‚¹è½¬åˆ°ç›¸æœºåæ ‡ç³»
 		inline Vector3d w2f(const Vector3d& xyz_w) const { return T_f_w_ * xyz_w; }
 
-		///½«Ïà»ú×ø±êÏµÏÂµÄµã×ªµ½ÊÀ½ç×ø±êÏµÏÂ
+		///å°†ç›¸æœºåæ ‡ç³»ä¸‹çš„ç‚¹è½¬åˆ°ä¸–ç•Œåæ ‡ç³»ä¸‹
 		inline Vector3d f2w(const Vector3d& f) const { return T_f_w_.inverse() * f; }
 
-		/// ÉãÏñ»ú×ø±êÏµÏÂµÄµã×ªÏñËØ×ø±ê
+		/// æ‘„åƒæœºåæ ‡ç³»ä¸‹çš„ç‚¹è½¬åƒç´ åæ ‡
 		inline Vector2d f2c(const Vector3d& f) const { return cam_->world2cam(f); }
-		/// ·µ»ØÖ¡ÔÚÊÀ½ç×ø±êÏµÖĞµÄÎ»ÖÃ
+		/// è¿”å›å¸§åœ¨ä¸–ç•Œåæ ‡ç³»ä¸­çš„ä½ç½®
 		inline Vector3d pos() const { return T_f_w_.inverse().translation(); }
 
+		/// å½“å‰æ‘„åƒæœºåæ ‡ç³»ä¸‹3Dç‚¹xyzåˆ°å•ä½å¹³é¢åæ ‡uv(focal length = 1)çš„é›…å…‹æ¯”çŸ©é˜µ
+		inline static void jacobian_xyz2uv(
+			const Vector3d& xyz_in_f,
+			Matrix<double, 2, 6>& J)
+		{
+			const double x = xyz_in_f[0];
+			const double y = xyz_in_f[1];
+			const double z_inv = 1. / xyz_in_f[2];
+			const double z_inv_2 = z_inv*z_inv;
+
+			J(0, 0) = -z_inv;              // -1/z
+			J(0, 1) = 0.0;                 // 0
+			J(0, 2) = x*z_inv_2;           // x/z^2
+			J(0, 3) = y*J(0, 2);            // x*y/z^2
+			J(0, 4) = -(1.0 + x*J(0, 2));   // -(1.0 + x^2/z^2)
+			J(0, 5) = y*z_inv;             // y/z
+
+			J(1, 0) = 0.0;                 // 0
+			J(1, 1) = -z_inv;              // -1/z
+			J(1, 2) = y*z_inv_2;           // y/z^2
+			J(1, 3) = 1.0 + y*J(1, 2);      // 1.0 + y^2/z^2
+			J(1, 4) = -J(0, 3);             // -x*y/z^2
+			J(1, 5) = -x*z_inv;            // x/z
+		}
 	private:
-		/// Í¨¹ı°ë²ÉÓÃµÄ·½Ê½´´½¨Í¼Ïñ½ğ×ÖËş
+		/// é€šè¿‡åŠé‡‡ç”¨çš„æ–¹å¼åˆ›å»ºå›¾åƒé‡‘å­—å¡”
 		void createImgPyramid(const cv::Mat& img_level_0, int n_levels, ImgPyr& pyr);
 		
 	public:
-		static int                    frame_counter_;         //!< ´´½¨Ö¡µÄ¼ÆÊıÆ÷£¬ÓÃÓÚÉèÖÃÖ¡µÄÎ¨Ò»id
-		int                           id_;                    //!< Ö¡µÄÎ¨Ò»id
-		double                        timestamp_;             //!< Ö¡±»¼ÇÂ¼µÄÊ±¼ä´Á
-		AbstractCamera                *cam_;                  //!< Ïà»úÄ£ĞÍ
-		Sophus::SE3                   T_f_w_;                 //!< ´ÓÊÀ½ç×ø±êÏµ(w)orld×ªµ½ÉãÏñ»ú×ø±êÏµ(f)rame£¬¸ÕĞÔ±ä»»Rt
-		ImgPyr                        img_pyr_;               //!< Í¼Ïñ½ğ×ÖËş
-		Features                      fts_;                   //!< Í¼ÏñÖĞµÄÌØÕ÷List
+		static int                    frame_counter_;         //!< åˆ›å»ºå¸§çš„è®¡æ•°å™¨ï¼Œç”¨äºè®¾ç½®å¸§çš„å”¯ä¸€id
+		int                           id_;                    //!< å¸§çš„å”¯ä¸€id
+		double                        timestamp_;             //!< å¸§è¢«è®°å½•çš„æ—¶é—´æˆ³
+		AbstractCamera                *cam_;                  //!< ç›¸æœºæ¨¡å‹
+		Sophus::SE3                   T_f_w_;                 //!< ä»ä¸–ç•Œåæ ‡ç³»(w)orldè½¬åˆ°æ‘„åƒæœºåæ ‡ç³»(f)rameï¼Œåˆšæ€§å˜æ¢Rt
+		ImgPyr                        img_pyr_;               //!< å›¾åƒé‡‘å­—å¡”
+		Features                      fts_;                   //!< å›¾åƒä¸­çš„ç‰¹å¾List
 	};
 	typedef std::shared_ptr<Frame> FramePtr;
 }

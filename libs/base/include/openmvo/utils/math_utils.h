@@ -59,6 +59,20 @@ namespace mvo
 			-v[1], v[0], 0;
 		return v_sqew;
 	}
+
+	inline double norm_max(const Eigen::VectorXd & v)
+	{
+		double max = -1;
+		for (int i = 0; i < v.size(); i++)
+		{
+			double abs = fabs(v[i]);
+			if (abs > max){
+				max = abs;
+			}
+		}
+		return max;
+	}
+
 	double sampsonusError(
 		const Vector2d &v2Dash,
 		const Matrix3d& m3Essential,

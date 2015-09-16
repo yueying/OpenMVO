@@ -1,11 +1,11 @@
 /*************************************************************************
- * 文件名： initial_position
+ * 文件名： image_align
  *
  * 作者： 冯兵
  * 邮件： fengbing123@gmail.com
- * 时间： 2015/8/7
+ * 时间： 2015/8/15
  *
- * 说明： 计算初始位置
+ * 说明： 
  *************************************************************************/
 #include <string>
 #include <opencv2/opencv.hpp>
@@ -15,6 +15,7 @@
 #include <openmvo/mvo/fast_detector.h>
 #include <openmvo/mvo/frame.h>
 #include <openmvo/mvo/initialization.h>
+#include <openmvo/mvo/sparse_img_align.h>
 
 using namespace mvo;
 using namespace std;
@@ -24,9 +25,11 @@ int main(int argc, char *argv[])
 	CmdLine cmd;
 	std::string first_frame_name;
 	std::string second_frame_name;
+	std::string third_frame_name;
 
 	cmd.add(make_option('f', first_frame_name, "firstname"));
 	cmd.add(make_option('s', second_frame_name, "secondname"));
+	cmd.add(make_option('t', third_frame_name, "thirdname"));
 	try {
 		if (argc == 1) throw std::string("Invalid command line parameter.");
 		cmd.process(argc, argv);
@@ -35,6 +38,7 @@ int main(int argc, char *argv[])
 		std::cerr << "Feature detector \nUsage: " << argv[0] << "\n"
 			<< "[-f|--firstname name]\n"
 			<< "[-s|--secondname name]\n"
+			<< "[-t|--thirdname name]\n"
 			<< std::endl;
 
 		std::cerr << s << std::endl;
@@ -42,18 +46,28 @@ int main(int argc, char *argv[])
 	}
 	cv::Mat first_img(cv::imread(first_frame_name, 0));
 	cv::Mat second_img(cv::imread(second_frame_name, 0));
+	cv::Mat third_img(cv::imread(third_frame_name, 0));
 	assert(first_img.type() == CV_8UC1 && !first_img.empty());
 	assert(second_img.type() == CV_8UC1 && !second_img.empty());
+	assert(third_img.type() == CV_8UC1 && !third_img.empty());
 
 	AbstractCamera* cam = new PinholeCamera(752, 480, 315.5, 315.5, 376.0, 240.0);
 
 	FramePtr fisrt_frame(new Frame(cam, first_img, 0.0));
 	FramePtr second_frame(new Frame(cam, second_img, 1.0));
-	
+	FramePtr third_frame(new Frame(cam, third_img, 1.0));
+
 	Initialization init;
 	init.addFirstFrame(fisrt_frame);
 	init.addSecondFrame(second_frame);
-	std::cout << second_frame->T_f_w_ << std::endl;
 
+	SparseImgAlign img_align(4, 1,
+		30, SparseImgAlign::GaussNewton, false, false);
+	size_t img_align_n_tracked = img_align.run(second_frame, third_frame);
+	std::cout << "Img Align:\t Tracked = " << img_align_n_tracked << std::endl;
+	std::cout << "first pose:" << fisrt_frame->T_f_w_ << '\n'
+		<< "second pose:" << second_frame->T_f_w_ << '\n'
+		<< "third pose:"<< third_frame->T_f_w_ << std::endl;
+	getchar();
 	return 0;
 }
