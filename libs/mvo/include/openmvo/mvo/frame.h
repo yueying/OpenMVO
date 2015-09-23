@@ -37,8 +37,24 @@ namespace mvo{
 		/// 初始化新的图像帧，创建图像金字塔
 		void initFrame(const cv::Mat& img);
 
+		/// 选择这个帧作为关键帧，主要用于设置关键帧的关键点
+		void setKeyframe();
+
 		/// 往帧中添加特征
 		void addFeature(Feature* ftr);
+
+		/// 这些点用于快速检测是否两个帧有重叠的视野，选取5个特征，一个在图像中点
+		/// 另外4个靠近图像的4个边角，并且这5个特征都要有对应的3D点。
+		void setKeyPoints();
+
+		/// 检测是否我们选择了5个较好的特征点
+		void checkKeyPoints(Feature* ftr);
+
+		/// 如果一个特征被删除，我们必须移除与其可能对应的关键特征
+		void removeKeyPoint(Feature* ftr);
+
+		/// 检测在世界坐标系的点是否在图像中可见
+		bool isVisible(const Vector3d& xyz_w) const;
 
 		/// 得到帧所对应的原始图像
 		inline const cv::Mat& img() const { return img_pyr_[0]; }
@@ -98,6 +114,8 @@ namespace mvo{
 		Sophus::SE3                   T_f_w_;                 //!< 从世界坐标系(w)orld转到摄像机坐标系(f)rame，刚性变换Rt
 		ImgPyr                        img_pyr_;               //!< 图像金字塔
 		Features                      fts_;                   //!< 图像中的特征List
+		std::vector<Feature*>         key_pts_;               //!< 使用5个特征及关联的3D点，用于检测两帧之间是否有重叠的视野
+		bool                          is_keyframe_;           //!< 该帧是否选择为关键帧
 	};
 	typedef std::shared_ptr<Frame> FramePtr;
 }

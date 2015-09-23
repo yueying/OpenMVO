@@ -20,7 +20,7 @@
 namespace mvo
 {
 #ifdef __SSE2__
-	void halfSampleSSE2(const unsigned char* in, unsigned char* out, int w, int h)
+	inline void halfSampleSSE2(const unsigned char* in, unsigned char* out, int w, int h)
 	{
 		const unsigned long long mask[2] = { 0x00FF00FF00FF00FFull, 0x00FF00FF00FF00FFull };
 		const unsigned char* nextRow = in + w;
@@ -48,7 +48,7 @@ namespace mvo
 	}
 #endif 
 
-	void halfSample(const cv::Mat& in, cv::Mat& out)
+	inline void halfSample(const cv::Mat& in, cv::Mat& out)
 	{
 		assert(in.rows / 2 == out.rows && in.cols / 2 == out.cols);
 		assert(in.type() == CV_8U && out.type() == CV_8U);
@@ -79,6 +79,26 @@ namespace mvo
 			top += stride;
 			bottom += stride;
 		}
+	}
+
+	/**	通过双边差值返回像素值从0到255，注意这边没有检查x，y是否在border内
+	 */
+	inline float interpolateMat_8u(const cv::Mat& mat, float u, float v)
+	{
+		assert(mat.type() == CV_8U);
+		int x = floor(u);
+		int y = floor(v);
+		float subpix_x = u - x;
+		float subpix_y = v - y;
+
+		float w00 = (1.0f - subpix_x)*(1.0f - subpix_y);
+		float w01 = (1.0f - subpix_x)*subpix_y;
+		float w10 = subpix_x*(1.0f - subpix_y);
+		float w11 = 1.0f - w00 - w01 - w10;
+
+		const int stride = mat.step.p[0];
+		unsigned char* ptr = mat.data + y*stride + x;
+		return w00*ptr[0] + w01*ptr[stride] + w10*ptr[1] + w11*ptr[stride + 1];
 	}
 
 }
