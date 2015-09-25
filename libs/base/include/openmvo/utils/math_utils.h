@@ -1,11 +1,11 @@
-/*************************************************************************
- * ÎÄ¼şÃû£º math_utils
+ï»¿/*************************************************************************
+ * æ–‡ä»¶åï¼š math_utils
  *
- * ×÷Õß£º ·ë±ø
- * ÓÊ¼ş£º fengbing123@gmail.com
- * Ê±¼ä£º 2015/9/7
+ * ä½œè€…ï¼š å†¯å…µ
+ * é‚®ä»¶ï¼š fengbing123@gmail.com
+ * æ—¶é—´ï¼š 2015/9/7
  *
- * ËµÃ÷£º 
+ * è¯´æ˜ï¼š 
  *************************************************************************/
 #ifndef OPENMVO_UTILS_MATH_UTILS_H_
 #define OPENMVO_UTILS_MATH_UTILS_H_
@@ -39,18 +39,18 @@ namespace mvo
 		std::vector<int>& inliers,
 		std::vector<int>& outliers);
 
-	/// Í¶Ó°£¬ÉãÏñ»ú×ø±êÏµÏÂ×ø±ê×ªÏñËØÊÀ½ç×ø±ê
+	/// æŠ•å½±ï¼Œæ‘„åƒæœºåæ ‡ç³»ä¸‹åæ ‡è½¬åƒç´ ä¸–ç•Œåæ ‡
 	inline Vector2d project2d(const Vector3d& v)
 	{
 		return v.head<2>() / v[2];
 	}
 
-	/// ·´Í¶Ó°£¬½«ÏñËØµÄÊÀ½ç×ø±ê×ªÏà¶ÔÓÚµÄÉãÏñ»ú×ø±ê
+	/// åæŠ•å½±ï¼Œå°†åƒç´ çš„ä¸–ç•Œåæ ‡è½¬ç›¸å¯¹äºçš„æ‘„åƒæœºåæ ‡
 	inline Vector3d unproject2d(const Vector2d& v)
 	{
 		return Vector3d(v[0], v[1], 1.0);
 	}
-	///¸ø³ö·´¶Ô³Æ¾ØÕó
+	///ç»™å‡ºåå¯¹ç§°çŸ©é˜µ
 	inline Matrix3d sqew(const Vector3d& v)
 	{
 		Matrix3d v_sqew;
@@ -77,13 +77,13 @@ namespace mvo
 		const Vector2d &v2Dash,
 		const Matrix3d& m3Essential,
 		const Vector2d& v2);
-	///¸ø³öÖĞÖµ
+	///ç»™å‡ºä¸­å€¼
 	template<class T>
 	T getMedian(std::vector<T>& data_vec)
 	{
 		assert(!data_vec.empty());
 		typename std::vector<T>::iterator it = data_vec.begin() + floor(data_vec.size() / 2);
-		nth_element(data_vec.begin(), it, data_vec.end());//¶ÔÇ°n¸öÊı½øĞĞÅÅĞò
+		nth_element(data_vec.begin(), it, data_vec.end());//å¯¹å‰nä¸ªæ•°è¿›è¡Œæ’åº
 		return *it;
 	}
 }

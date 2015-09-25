@@ -78,7 +78,7 @@ namespace mvo{
 		/// 返回帧在世界坐标系中的位置
 		inline Vector3d pos() const { return T_f_w_.inverse().translation(); }
 
-		/// 当前摄像机坐标系下3D点xyz到单位平面坐标uv(focal length = 1)的雅克比矩阵
+		/// 3D点xyz到单位平面坐标uv(focal length = 1)的对位姿求的雅克比矩阵
 		inline static void jacobian_xyz2uv(
 			const Vector3d& xyz_in_f,
 			Matrix<double, 2, 6>& J)

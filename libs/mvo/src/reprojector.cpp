@@ -145,7 +145,7 @@ namespace mvo
 			Feature* new_feature = new Feature(frame.get(), it->px, matcher_.search_level_);
 			frame->addFeature(new_feature);
 
-			// 这边我们添加点到特征的引用，另外一种方式就是将这个帧作为关键帧，只做一次
+			// 这边我们添加点到特征的引用
 			new_feature->point = it->pt;
 
 			// 如果关键帧已经选择，也重投影其他点，则我们不需要检测这个点

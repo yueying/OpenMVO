@@ -1,5 +1,5 @@
 /*************************************************************************
-* 文件名： reprojection
+* 文件名： pose_and_structure
 *
 * 作者： 冯兵
 * 邮件： fengbing123@gmail.com
@@ -18,6 +18,10 @@
 #include <openmvo/mvo/sparse_img_align.h>
 #include <openmvo/mvo/map.h>
 #include <openmvo/mvo/reprojector.h>
+#include <openmvo/mvo/pose_optimizer.h>
+#include <openmvo/mvo/structure_optimizer.h>
+#include <openmvo/mvo/feature.h>
+#include <openmvo/mvo/point3d.h>
 
 using namespace mvo;
 using namespace std;
@@ -63,7 +67,8 @@ int main(int argc, char *argv[])
 	init.addFirstFrame(fisrt_frame);
 	init.addSecondFrame(second_frame);
 
-	third_frame->T_f_w_ = second_frame->T_f_w_;
+	third_frame->T_f_w_ = second_frame->T_f_w_;//将上一帧的初值赋给这一帧，便于优化
+
 	SparseImgAlign img_align(4, 1,
 		30, SparseImgAlign::GaussNewton, false, false);
 	size_t img_align_n_tracked = img_align.run(second_frame, third_frame);
@@ -73,12 +78,21 @@ int main(int argc, char *argv[])
 	second_frame->setKeyframe();
 	map.addKeyframe(fisrt_frame);
 	map.addKeyframe(second_frame);
-	Reprojector reprojector(cam,map);
+	Reprojector reprojector(cam, map);
 	std::vector< std::pair<FramePtr, size_t> > overlap_kfs;
 	reprojector.reprojectMap(third_frame, overlap_kfs);
 	const size_t repr_n_new_references = reprojector.n_matches_;
 	const size_t repr_n_mps = reprojector.n_trials_;
-	std::cout << "Reprojection:\t Points = " << repr_n_mps << "\t \t Matches = " << repr_n_new_references<<std::endl;
+	std::cout << "Reprojection:\t Points = " << repr_n_mps << "\t \t Matches = " << repr_n_new_references << std::endl;
+
+	size_t sfba_n_edges_final;
+	double sfba_thresh, sfba_error_init, sfba_error_final;
+	std::cout << "pose:" << third_frame->T_f_w_;
+	poseOptimize(2.0, 10, false,third_frame, sfba_thresh, sfba_error_init, sfba_error_final, sfba_n_edges_final);
+	std::cout << "PoseOptimizer:pose" << third_frame->T_f_w_;
+	std::cout << "point:" << third_frame->fts_.front()->point->pos_<<std::endl;
+	structureOptimize(third_frame, 20, 5);
+	std::cout << "structureOptimize:point:" << third_frame->fts_.front()->point->pos_;
 	getchar();
 	return 0;
 }
