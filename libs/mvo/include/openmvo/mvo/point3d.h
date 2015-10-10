@@ -3,9 +3,9 @@
  *
  * 作者： 冯兵
  * 邮件： fengbing123@gmail.com
- * 时间： 2015/9/7
+ * 时间： 2015/8/7
  *
- * 说明： 特征对应的3D点
+ * 说明： 特征对应的3D点参考rpg_svo(https://github.com/uzh-rpg/rpg_svo)
  *************************************************************************/
 #ifndef OPENMVO_MVO_POINT3D_H_
 #define OPENMVO_MVO_POINT3D_H_

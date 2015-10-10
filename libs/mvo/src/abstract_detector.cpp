@@ -28,5 +28,21 @@ namespace mvo
 		std::fill(grid_occupancy_.begin(), grid_occupancy_.end(), false);
 	}
 
+	/// 将已经存在特征的单元格设置为被占用
+	void AbstractDetector::setExistingFeatures(const Features& fts)
+	{
+		std::for_each(fts.begin(), fts.end(), [&](Feature* i){
+			grid_occupancy_.at(
+				static_cast<int>(i->px[1] / cell_size_)*grid_n_cols_
+				+ static_cast<int>(i->px[0] / cell_size_)) = true;
+		});
+	}
+
+	void AbstractDetector::setGridOccupancy(const Vector2d& px)
+	{
+		grid_occupancy_.at(
+			static_cast<int>(px[1] / cell_size_)*grid_n_cols_
+			+ static_cast<int>(px[0] / cell_size_)) = true;
+	}
 
 }

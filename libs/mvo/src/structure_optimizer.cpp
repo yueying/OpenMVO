@@ -3,9 +3,9 @@
  *
  * 作者： 冯兵
  * 邮件： fengbing123@gmail.com
- * 时间： 2015/9/24
+ * 时间： 2015/8/24
  *
- * 说明： 
+ * 说明： 参考rpg_svo(https://github.com/uzh-rpg/rpg_svo)
  *************************************************************************/
 #include <openmvo/mvo/structure_optimizer.h>
 #include <deque>

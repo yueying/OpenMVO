@@ -35,6 +35,11 @@ namespace mvo
 			const double detection_threshold,
 			Features& fts) = 0;
 
+		/// 将已经存在特征的单元格设置为被占用
+		void setExistingFeatures(const Features& fts);
+
+		/// 标识设置单元格已经被占用
+		void setGridOccupancy(const Vector2d& px);
 	protected:
 		/// 将所有格子重新设置，设置为没有占用
 		void resetGrid();

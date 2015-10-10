@@ -5,7 +5,7 @@
  * 邮件： fengbing123@gmail.com
  * 时间： 2015/8/3
  *
- * 说明： fast特征检测
+ * 说明： fast特征检测参考rpg_svo(https://github.com/uzh-rpg/rpg_svo)
  *************************************************************************/
 #include "openmvo/mvo/abstract_detector.h"
 #include "openmvo/mvo/frame.h"

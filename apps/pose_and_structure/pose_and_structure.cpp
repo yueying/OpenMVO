@@ -5,7 +5,7 @@
 * 邮件： fengbing123@gmail.com
 * 时间： 2015/8/15
 *
-* 说明：
+* 说明：参考rpg_svo(https://github.com/uzh-rpg/rpg_svo)
 *************************************************************************/
 #include <string>
 #include <opencv2/opencv.hpp>

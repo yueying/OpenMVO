@@ -3,9 +3,9 @@
  *
  * 作者： 冯兵
  * 邮件： fengbing123@gmail.com
- * 时间： 2015/9/7
+ * 时间： 2015/8/7
  *
- * 说明： 初始相关关系确定
+ * 说明： 初始相关关系确定参考rpg_svo(https://github.com/uzh-rpg/rpg_svo)
  *************************************************************************/
 #include "openmvo/mvo/initialization.h"
 #include <opencv2/opencv.hpp>
@@ -14,6 +14,7 @@
 #include "openmvo/mvo/homography.h"
 #include "openmvo/mvo/fast_detector.h"
 #include "openmvo/mvo/point3d.h"
+#include <openmvo/mvo/config.h>
 
 namespace mvo
 {
@@ -115,8 +116,8 @@ namespace mvo
 	{
 		Features new_features;
 		FastDetector detector(
-			frame->img().cols, frame->img().rows, 25, 3);
-		detector.detect(frame.get(), frame->img_pyr_, 20.0, new_features);
+			frame->img().cols, frame->img().rows, Config::gridSize(), Config::nPyrLevels());
+		detector.detect(frame.get(), frame->img_pyr_, Config::triangMinCornerScore(), new_features);
 
 		// 返回特征位置和特征的单位向量
 		px_vec.clear(); px_vec.reserve(new_features.size());

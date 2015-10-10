@@ -5,7 +5,7 @@
  * 邮件： fengbing123@gmail.com
  * 时间： 2015/8/23
  *
- * 说明： 
+ * 说明： 参考rpg_svo(https://github.com/uzh-rpg/rpg_svo)
  *************************************************************************/
 #ifndef OPENMVO_MVO_POSE_OPTIMIZER_H_
 #define OPENMVO_MVO_POSE_OPTIMIZER_H_

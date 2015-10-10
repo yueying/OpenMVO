@@ -1,4 +1,13 @@
-﻿#ifndef OPENMVO_MVO_SPARSE_IMG_ALIGN_H_
+﻿/*************************************************************************
+ * 文件名： sparse_img_align
+ *
+ * 作者： 冯兵
+ * 邮件： fengbing123@gmail.com
+ * 时间： 2015/8/25
+ *
+ * 说明： 参考rpg_svo(https://github.com/uzh-rpg/rpg_svo)
+ *************************************************************************/
+#ifndef OPENMVO_MVO_SPARSE_IMG_ALIGN_H_
 #define OPENMVO_MVO_SPARSE_IMG_ALIGN_H_
 
 #include <opencv2/opencv.hpp>

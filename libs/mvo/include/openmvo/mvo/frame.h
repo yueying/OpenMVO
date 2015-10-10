@@ -56,6 +56,8 @@ namespace mvo{
 		/// 检测在世界坐标系的点是否在图像中可见
 		bool isVisible(const Vector3d& xyz_w) const;
 
+		/// 判断选择的帧是否为关键帧
+		inline bool isKeyframe() const { return is_keyframe_; }
 		/// 得到帧所对应的原始图像
 		inline const cv::Mat& img() const { return img_pyr_[0]; }
 		/// 将世界坐标系中的点转到像素坐标

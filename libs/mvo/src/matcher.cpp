@@ -3,15 +3,17 @@
  *
  * 作者： 冯兵
  * 邮件： fengbing123@gmail.com
- * 时间： 2015/9/18
+ * 时间： 2015/8/18
  *
- * 说明： 
+ * 说明： 参考rpg_svo(https://github.com/uzh-rpg/rpg_svo)
  *************************************************************************/
 #include <openmvo/mvo/matcher.h>
 #include <openmvo/mvo/config.h>
 #include <openmvo/mvo/feature.h>
 #include <openmvo/utils/image_utils.h>
 #include <openmvo/mvo/feature_alignment.h>
+#include <openmvo/utils/math_utils.h>
+#include <openmvo/mvo/patch_score.h>
 
 namespace mvo
 {
@@ -132,6 +134,139 @@ namespace mvo
 			for (int x = 0; x < patch_size_; ++x)
 				ref_patch_ptr[x] = ref_patch_border_ptr[x];
 		}
+	}
+
+	bool Matcher::findEpipolarMatchDirect(
+		const Frame& ref_frame,
+		const Frame& cur_frame,
+		const Feature& ref_ftr,
+		const double d_estimate,
+		const double d_min,
+		const double d_max,
+		double& depth)
+	{
+		SE3 T_cur_ref = cur_frame.T_f_w_ * ref_frame.T_f_w_.inverse();// 计算当前帧相对于相对帧的变换
+		int zmssd_best = PatchScore::threshold();
+		Vector2d uv_best;
+
+		//在旧的关键帧上计算极线的开始和结束用于匹配
+		Vector2d A = project2d(T_cur_ref * (ref_ftr.f*d_min));
+		Vector2d B = project2d(T_cur_ref * (ref_ftr.f*d_max));
+		epi_dir_ = A - B;//极线方向
+
+		// 计算仿射变换计算
+		getWarpMatrixAffine(
+			*ref_frame.cam_, *cur_frame.cam_, ref_ftr.px, ref_ftr.f,
+			d_estimate, T_cur_ref, ref_ftr.level, A_cur_ref_);
+
+		search_level_ = getBestSearchLevel(A_cur_ref_, Config::nPyrLevels() - 1);
+
+		// 转到像素坐标
+		Vector2d px_A(cur_frame.cam_->world2cam(A));
+		Vector2d px_B(cur_frame.cam_->world2cam(B));
+		// 给出极线搜索的长度
+		epi_length_ = (px_A - px_B).norm() / (1 << search_level_);
+
+		// 对面片进行仿射变换
+		warpAffine(A_cur_ref_, ref_frame.img_pyr_[ref_ftr.level], ref_ftr.px,
+			ref_ftr.level, search_level_, halfpatch_size_ + 1, patch_with_border_);
+		createPatchFromPatchWithBorder();
+
+		if (epi_length_ < 2.0)
+		{
+			px_cur_ = (px_A + px_B) / 2.0;
+			Vector2d px_scaled(px_cur_ / (1 << search_level_));
+			bool res = feature_alignment::align2D(
+				cur_frame.img_pyr_[search_level_], patch_with_border_, patch_,
+				options_.align_max_iter, px_scaled);
+			if (res)
+			{
+				px_cur_ = px_scaled*(1 << search_level_);
+				if (depthFromTriangulation(T_cur_ref, ref_ftr.f, cur_frame.cam_->cam2world(px_cur_), depth))
+					return true;
+			}
+			return false;
+		}
+
+		size_t n_steps = epi_length_ / 0.7; // 沿极线查找的步伐数目
+		Vector2d step = epi_dir_ / n_steps;
+
+		if (n_steps > options_.max_epi_search_steps)
+		{
+			printf("WARNING: skip epipolar search: %d evaluations, px_lenght=%f, d_min=%f, d_max=%f.\n",
+				n_steps, epi_length_, d_min, d_max);
+			return false;
+		}
+
+		PatchScore patch_score(patch_);
+
+		// 沿着极线进行取样
+		Vector2d uv = B - step;
+		Vector2i last_checked_pxi(0, 0);
+		++n_steps;
+		for (size_t i = 0; i < n_steps; ++i, uv += step)
+		{
+			Vector2d px(cur_frame.cam_->world2cam(uv));// 转像素
+			Vector2i pxi(px[0] / (1 << search_level_) + 0.5,
+				px[1] / (1 << search_level_) + 0.5); // +0.5 转到最接近的整数
+
+			if (pxi == last_checked_pxi)
+				continue;
+			last_checked_pxi = pxi;
+
+			// 检测面片是否在新帧中全部可见
+			if (!cur_frame.cam_->isInFrame(pxi, patch_size_, search_level_))
+				continue;
+
+			// TODO：这边可以进行插值
+			uint8_t* cur_patch_ptr = cur_frame.img_pyr_[search_level_].data
+				+ (pxi[1] - halfpatch_size_)*cur_frame.img_pyr_[search_level_].cols
+				+ (pxi[0] - halfpatch_size_);
+			int zmssd = patch_score.computeScore(cur_patch_ptr, cur_frame.img_pyr_[search_level_].cols);
+
+			if (zmssd < zmssd_best) {
+				zmssd_best = zmssd;
+				uv_best = uv;
+			}
+		}
+
+		if (zmssd_best < PatchScore::threshold())
+		{
+			if (options_.subpix_refinement)
+			{
+				px_cur_ = cur_frame.cam_->world2cam(uv_best);
+				Vector2d px_scaled(px_cur_ / (1 << search_level_));
+				bool res = feature_alignment::align2D(
+					cur_frame.img_pyr_[search_level_], patch_with_border_, patch_,
+					options_.align_max_iter, px_scaled);
+				if (res)
+				{
+					px_cur_ = px_scaled*(1 << search_level_);
+					if (depthFromTriangulation(T_cur_ref, ref_ftr.f, cur_frame.cam_->cam2world(px_cur_), depth))
+						return true;
+				}
+				return false;
+			}
+			px_cur_ = cur_frame.cam_->world2cam(uv_best);
+			if (depthFromTriangulation(T_cur_ref, ref_ftr.f, unproject2d(uv_best).normalized(), depth))
+				return true;
+		}
+		return false;
+	}
+
+	bool Matcher::depthFromTriangulation(
+		const SE3& T_search_ref,
+		const Vector3d& f_ref,
+		const Vector3d& f_cur,
+		double& depth)
+	{
+		Matrix<double, 3, 2> A; A << T_search_ref.rotation_matrix() * f_ref, f_cur;
+		const Matrix2d AtA = A.transpose()*A;
+		if (AtA.determinant() < 0.000001)
+			return false;
+		const Vector2d depth2 = -AtA.inverse()*A.transpose()*T_search_ref.translation();
+		depth = fabs(depth2[0]);
+		return true;
 	}
 
 }
