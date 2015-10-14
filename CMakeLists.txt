@@ -39,8 +39,9 @@ endif (ENABLE_SOLUTION_FOLDERS)
 
 #添加libs
 FIND_PACKAGE(OpenCV REQUIRED) #通过CMake系统添加OpenCV
+SET(OpenCV_STATIC OFF CACHE BOOL "Use Share OpenCV Lib")
 FIND_PACKAGE(g2o REQUIRED) #通过CMake系统添加g2o
-FIND_PACKAGE(Boost REQUIRED)
+#FIND_PACKAGE(Boost REQUIRED)
 
 include(cmake/script_eigen.cmake REQUIRED)  #添加Eigen
 #include(cmake/script_sophus.cmake REQUIRED) #添加Sophus

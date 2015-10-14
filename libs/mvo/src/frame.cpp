@@ -11,6 +11,7 @@
 #include "openmvo/mvo/frame.h"
 #include "openmvo/utils/image_utils.h"
 #include "openmvo/mvo/feature.h"
+#include <openmvo/utils/math_utils.h>
 
 namespace mvo
 {
@@ -150,6 +151,33 @@ namespace mvo
 			halfSample(pyr[i - 1], pyr[i]);
 		}
 	}
+	/// 帧处理的实用函数
+	namespace frame_utils {
 
+		// 计算一帧中特征中有对应的3D点，计算其离相机的深度，给出最小深度，和平均深度
+		bool getSceneDepth(const Frame& frame, double& depth_mean, double& depth_min)
+		{
+			std::vector<double> depth_vec;
+			depth_vec.reserve(frame.fts_.size());
+			depth_min = std::numeric_limits<double>::max();
+			for (auto it = frame.fts_.begin(), ite = frame.fts_.end(); it != ite; ++it)
+			{
+				if ((*it)->point != NULL)
+				{
+					// 计算离相机的深度
+					const double z = frame.w2f((*it)->point->pos_).z();
+					depth_vec.push_back(z);
+					depth_min = fmin(z, depth_min);
+				}
+			}
+			if (depth_vec.empty())
+			{
+				return false;
+			}
+			depth_mean = getMedian(depth_vec);
+			return true;
+		}
+
+	} // namespace frame_utils
 	
 }

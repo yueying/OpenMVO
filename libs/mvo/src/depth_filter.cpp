@@ -59,8 +59,8 @@ namespace mvo
 			seeds_updating_halt_ = true;
 			thread_->detach();
 			is_runing = false;
-			thread_->join();
-			thread_ = NULL;
+			//thread_->join();
+			//thread_ = NULL;
 		}
 	}
 
@@ -95,6 +95,41 @@ namespace mvo
 		}
 		else // 如果线程没有启动，则初始化种子点
 			initializeSeeds(frame);
+	}
+
+	void DepthFilter::removeKeyframe(FramePtr frame)
+	{
+		seeds_updating_halt_ = true;
+		lock_t lock(seeds_mut_);
+		std::list<Seed>::iterator it = seeds_.begin();
+		size_t n_removed = 0;
+		while (it != seeds_.end())
+		{
+			if (it->ftr->frame == frame.get())
+			{
+				it = seeds_.erase(it);
+				++n_removed;
+			}
+			else
+				++it;
+		}
+		seeds_updating_halt_ = false;
+	}
+
+	void DepthFilter::reset()
+	{
+		seeds_updating_halt_ = true;
+		{
+			lock_t lock(seeds_mut_);
+			seeds_.clear();
+		}
+		lock_t lock();
+		while (!frame_queue_.empty())
+			frame_queue_.pop();
+		seeds_updating_halt_ = false;
+
+		if (options_.verbose)
+			std::cout<<"DepthFilter: RESET."<<std::endl;
 	}
 
 	void DepthFilter::initializeSeeds(FramePtr frame)

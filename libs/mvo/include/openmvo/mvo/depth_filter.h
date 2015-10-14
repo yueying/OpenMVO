@@ -63,6 +63,10 @@ namespace mvo
 		/// 添加新的关键帧到队列
 		void addKeyframe(FramePtr frame, double depth_mean, double depth_min);
 
+		void removeKeyframe(FramePtr frame);
+
+		void reset();
+
 		/// 贝叶斯框架下更新种子点，x表示测量，tau2表示测量的不确定性
 		static void updateSeed(
 			const float x,

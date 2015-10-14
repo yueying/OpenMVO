@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	{
 		fast_detector.detect(frame.get(), frame->img_pyr_, 20.0, fts);
 	}
-	printf("Fast corner detection took %f ms, %d corners detected (ref i7-W520: 7.166360ms, 40000)\n", t.Stop() * 10, fts.size());
+	printf("Fast corner detection took %f ms, %d corners detected (ref i7-W520: 7.166360ms, 40000)\n", t.stop() * 10, fts.size());
 	printf("Note, in this case, feature detection also contains the cam2world projection of the feature.\n");
 	cv::Mat img_rgb = cv::Mat(img.size(), CV_8UC3);
 	cv::cvtColor(img, img_rgb, CV_GRAY2RGB);

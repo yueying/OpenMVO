@@ -96,6 +96,25 @@ namespace mvo
 			}
 		}
 
+		{
+			std::unique_lock<std::mutex> lock(map_.point_candidates_.mut_);
+			auto it = map_.point_candidates_.candidates_.begin();
+			while (it != map_.point_candidates_.candidates_.end())
+			{
+				if (!reprojectPoint(frame, it->first))
+				{
+					it->first->n_failed_reproj_ += 3;
+					if (it->first->n_failed_reproj_ > 30)
+					{
+						map_.point_candidates_.deleteCandidate(*it);
+						it = map_.point_candidates_.candidates_.erase(it);
+						continue;
+					}
+				}
+				++it;
+			}
+		} // 超出范围了则对互斥对象进行解锁
+
 		// 现在遍历所有的单元格，选择一个点进行匹配
 		for (size_t i = 0; i<grid_.cells.size(); ++i)
 		{
@@ -129,19 +148,27 @@ namespace mvo
 		while (it != cell.end())
 		{
 			++n_trials_;//重投影单元格的次数
-
+			if (it->pt->type_ == Point3D::TYPE_DELETED)
+			{
+				it = cell.erase(it);
+				continue;
+			}
 			bool found_match = true;
 			if (options_.find_match_direct)
 				found_match = matcher_.findMatchDirect(*it->pt, *frame, it->px);
 			if (!found_match)
 			{
 				it->pt->n_failed_reproj_++;
-				//TODO:对Map进行处理
+				if (it->pt->type_ == Point3D::TYPE_UNKNOWN && it->pt->n_failed_reproj_ > 15)
+					map_.safeDeletePoint(it->pt);
+				if (it->pt->type_ == Point3D::TYPE_CANDIDATE  && it->pt->n_failed_reproj_ > 30)
+					map_.point_candidates_.deleteCandidatePoint(it->pt);
 				it = cell.erase(it);
 				continue;
 			}
 			it->pt->n_succeeded_reproj_++;
-			
+			if (it->pt->type_ == Point3D::TYPE_UNKNOWN && it->pt->n_succeeded_reproj_ > 10)
+				it->pt->type_ = Point3D::TYPE_GOOD;
 			Feature* new_feature = new Feature(frame.get(), it->px, matcher_.search_level_);
 			frame->addFeature(new_feature);
 

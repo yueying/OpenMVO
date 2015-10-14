@@ -29,7 +29,18 @@ namespace mvo
 	{
 		obs_.push_front(ftr);
 	}
-
+	bool Point3D::deleteFrameRef(Frame* frame)
+	{
+		for (auto it = obs_.begin(), ite = obs_.end(); it != ite; ++it)
+		{
+			if ((*it)->frame == frame)
+			{
+				obs_.erase(it);
+				return true;
+			}
+		}
+		return false;
+	}
 	bool Point3D::getCloseViewObs(const Vector3d& framepos, Feature*& ftr) const
 	{
 		// TODO: 后期要确保点是相同的视图和相同的金字塔层

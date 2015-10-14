@@ -53,6 +53,9 @@ namespace mvo{
 		/// 如果一个特征被删除，我们必须移除与其可能对应的关键特征
 		void removeKeyPoint(Feature* ftr);
 
+		/// 返回观察到点的数目，对应的特征的数目
+		inline size_t nObs() const { return fts_.size(); }
+
 		/// 检测在世界坐标系的点是否在图像中可见
 		bool isVisible(const Vector3d& xyz_w) const;
 
@@ -119,6 +122,13 @@ namespace mvo{
 		std::vector<Feature*>         key_pts_;               //!< 使用5个特征及关联的3D点，用于检测两帧之间是否有重叠的视野
 		bool                          is_keyframe_;           //!< 该帧是否选择为关键帧
 	};
+	/// 针对帧处理的一些帮助函数
+	namespace frame_utils {
+
+		/// 得到图像中特征的平均深度
+		bool getSceneDepth(const Frame& frame, double& depth_mean, double& depth_min);
+
+	} // namespace frame_utils
 	typedef std::shared_ptr<Frame> FramePtr;
 }
 

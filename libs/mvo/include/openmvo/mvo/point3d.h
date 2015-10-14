@@ -13,6 +13,7 @@
 #include <list>
 #include <Eigen/Core>
 #include "openmvo/utils/noncopyable.h"
+#include <openmvo/mvo/frame.h>
 
 namespace mvo
 {
@@ -20,6 +21,7 @@ namespace mvo
 
 	using namespace Eigen;
 	typedef Matrix<double, 2, 3> Matrix23d;
+
 	/**	确保点对象唯一
 	 */
 	class Point3D : Noncopyable
@@ -27,10 +29,19 @@ namespace mvo
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
+			//提供点的类型
+		enum PointType {
+			TYPE_DELETED,//已删除
+			TYPE_CANDIDATE,//候选点
+			TYPE_UNKNOWN,//未知点
+			TYPE_GOOD//好的3d点
+		};
 		Point3D(const Vector3d& pos);
 		~Point3D();
 		/// 添加特征到一个帧中
 		void addFrameRef(Feature* ftr);
+		/// 删除指定帧
+		bool deleteFrameRef(Frame* frame);
 		/// 得到具有相近视角的观察特征
 		bool getCloseViewObs(const Vector3d& pos, Feature*& obs) const;
 		/// 优化点的位置通过最小重投影误差
@@ -57,10 +68,12 @@ namespace mvo
 		int                         id_;                      //!< 点唯一的id
 		Vector3d                    pos_;                     //!< 点在世界坐标系中的位置
 		std::list<Feature*>         obs_;                     //!< 对应这个点的特征
+		int                         last_published_ts_;       //!< 上一次发布的时间戳
 		int                         last_projected_kf_id_;    //!< 重投影的标识，不对同一个点重投影两次
 		int                         n_failed_reproj_;         //!< 重投影失败的数量，用于评价点的质量
 		int                         n_succeeded_reproj_;      //!< 重投影成功的数量，用于评价点的质量
 		int                         last_structure_optim_;    //!< 最近点优化的时间戳
+		PointType                   type_;                    //!< 点的类型
 	};
 
 }
