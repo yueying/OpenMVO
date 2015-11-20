@@ -62,10 +62,14 @@ namespace mvo {
 	};
 
 	inline void * aligned_alloc(size_t count, size_t alignment){
-		/*void * mem = NULL;
-		assert(posix_memalign(&mem, alignment, count) == 0);
-		return mem;*/
+		
+#ifdef _WIN32
 		return _aligned_malloc(count, alignment);
+#else
+                void * mem = NULL;
+		assert(posix_memalign(&mem, alignment, count) == 0);
+		return mem;
+#endif
 	}
 
 	inline void aligned_free(void * memory) {

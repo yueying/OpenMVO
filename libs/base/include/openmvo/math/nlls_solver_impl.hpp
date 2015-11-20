@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <openmvo/utils/math_utils.h>
+#include <openmvo/math/robust_cost.h>
 
 template <int D, typename T>
 void mvo::NLLSSolver<D, T>::optimize(ModelType& model)
@@ -231,25 +232,25 @@ void mvo::NLLSSolver<D, T>::setRobustCostFunction(
 	case TDistScale:
 		if (verbose_)
 			printf("Using TDistribution Scale Estimator\n");
-		scale_estimator_.reset(new robust_cost::TDistributionScaleEstimator());
+		scale_estimator_.reset(new TDistributionScaleEstimator());
 		use_weights_ = true;
 		break;
 	case MADScale:
 		if (verbose_)
 			printf("Using MAD Scale Estimator\n");
-		scale_estimator_.reset(new robust_cost::MADScaleEstimator());
+		scale_estimator_.reset(new MADScaleEstimator());
 		use_weights_ = true;
 		break;
 	case NormalScale:
 		if (verbose_)
 			printf("Using Normal Scale Estimator\n");
-		scale_estimator_.reset(new robust_cost::NormalDistributionScaleEstimator());
+		scale_estimator_.reset(new NormalDistributionScaleEstimator());
 		use_weights_ = true;
 		break;
 	default:
 		if (verbose_)
 			printf("Using Unit Scale Estimator\n");
-		scale_estimator_.reset(new robust_cost::UnitScaleEstimator());
+		scale_estimator_.reset(new UnitScaleEstimator());
 		use_weights_ = false;
 	}
 
@@ -258,22 +259,22 @@ void mvo::NLLSSolver<D, T>::setRobustCostFunction(
 	case TDistWeight:
 		if (verbose_)
 			printf("Using TDistribution Weight Function\n");
-		weight_function_.reset(new robust_cost::TDistributionWeightFunction());
+		weight_function_.reset(new TDistributionWeightFunction());
 		break;
 	case TukeyWeight:
 		if (verbose_)
 			printf("Using Tukey Weight Function\n");
-		weight_function_.reset(new robust_cost::TukeyWeightFunction());
+		weight_function_.reset(new TukeyWeightFunction());
 		break;
 	case HuberWeight:
 		if (verbose_)
 			printf("Using Huber Weight Function\n");
-		weight_function_.reset(new robust_cost::HuberWeightFunction());
+		weight_function_.reset(new HuberWeightFunction());
 		break;
 	default:
 		if (verbose_)
 			printf("Using Unit Weight Function\n");
-		weight_function_.reset(new robust_cost::UnitWeightFunction());
+		weight_function_.reset(new UnitWeightFunction());
 	}
 }
 

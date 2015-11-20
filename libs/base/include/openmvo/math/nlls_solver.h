@@ -8,7 +8,7 @@
 #include <Eigen/Core>
 #include <Eigen/StdVector>
 
-#include "openmvo/math/robust_cost.h"
+#include <openmvo/math/robust_cost.h>
 
 namespace mvo {
 

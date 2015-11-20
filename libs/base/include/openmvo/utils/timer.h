@@ -60,10 +60,14 @@ namespace mvo
 		inline void start()
 		{
 			accumulated_ = 0.0;
-			/*gettimeofday(&start_time_, NULL);*/
+			
+#if _WIN32
 			LARGE_INTEGER li_start_;
 			QueryPerformanceCounter(&li_start_);
 			start_ = static_cast<double>(li_start_.QuadPart);
+#else
+                        gettimeofday(&start_time_, NULL);
+#endif
 		}
 
 		inline void resume()

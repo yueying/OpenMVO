@@ -188,7 +188,7 @@ namespace mvo
 			return false;
 		}
 
-		size_t n_steps = epi_length_ / 0.7; // 沿极线查找的步伐数目
+		int n_steps = epi_length_ / 0.7; // 沿极线查找的步伐数目
 		Vector2d step = epi_dir_ / n_steps;
 
 		if (n_steps > options_.max_epi_search_steps)

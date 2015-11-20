@@ -12,8 +12,8 @@
 
 #include <opencv2/opencv.hpp>
 #include <sophus/se3.h>
-#include "openmvo/math/nlls_solver.h"
-#include "openmvo/mvo/frame.h"
+#include <openmvo/math/nlls_solver.h>
+#include <openmvo/mvo/frame.h>
 
 namespace mvo {
 
