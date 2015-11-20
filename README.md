@@ -1,3 +1,7 @@
 #openmvo
-Ö÷ÒªÊÇÑ§Ï°[rpg_svo](https://github.com/uzh-rpg/rpg_svo) ¸ù¾İ´úÂëºÍÂÛÎÄ½øĞĞÒ»²½²½µÄ·ÖÎö¡£
-¾ßÌå¼û²©¿Í[fengbing.net](http://www.fengbing.net)
+ä¸»è¦æ˜¯å­¦ä¹ [rpg_svo](https://github.com/uzh-rpg/rpg_svo) æ ¹æ®ä»£ç å’Œè®ºæ–‡è¿›è¡Œä¸€æ­¥æ­¥çš„åˆ†æã€‚
+å…·ä½“è§åšå®¢[fengbing.net](http://www.fengbing.net)
+
+##ç¯å¢ƒ
+æµ‹è¯•ç¯å¢ƒï¼šwindows8.1ä¸‹vs2013ä»¥åŠubuntu14.04 g++4.8.4
+è¿è¡Œå‰è¯·å…ˆå®‰è£…[g2o](https://github.com/RainerKuemmerle/g2o.git),å…·ä½“å‚è€ƒå…¶README
